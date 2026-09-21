@@ -1,0 +1,718 @@
+@import "tailwindcss";
+
+/* ============================================================
+   THEME TOKENS
+   ============================================================ */
+:root {
+  --bg:              #f5f2ed;
+  --bg-alt:          #efecea;
+  --surface:         #ffffff;
+  --surface-2:       #f0ede8;
+  --border:          rgba(0,0,0,0.10);
+  --border-mid:      rgba(0,0,0,0.18);
+  --text:            #111010;
+  --text-2:          #3a3835;
+  --text-muted:      #6a6662;
+  --text-dim:        #9a9692;
+  --accent:          #111010;
+  --accent-inv:      #f5f2ed;
+  --accent-green:    #2a6a2a;
+  --accent-green-bg: rgba(42,106,42,0.10);
+  --accent-blue:     #2d5bff;
+  --accent-blue-bg:  rgba(45,91,255,0.12);
+  --tag-bg:          rgba(0,0,0,0.05);
+  --tag-border:      rgba(0,0,0,0.10);
+  --tag-text:        #5a5652;
+  --shadow:          0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-hover:    0 4px 24px rgba(0,0,0,0.13), 0 1px 3px rgba(0,0,0,0.08);
+  --marquee-sep:     #c8b89a;
+  --nav-bg:          rgba(245,242,237,0.92);
+  --input-bg:        #faf9f7;
+  --input-placeholder: #b0aca8;
+
+  /* Layout scale — single source of truth for page rhythm.
+     These resolve to the original desktop values at >=1160px. */
+  --container-max:     1160px;
+  --container-pad:     clamp(16px, 3.4vw, 40px);
+  --nav-h:             64px;
+  --section-y:         clamp(72px, 9vw, 120px);
+  --section-y-sm:      clamp(64px, 8vw, 100px);
+  --card-radius:       16px;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg:              #0c0c0b;
+  --bg-alt:          #111110;
+  --surface:         #161614;
+  --surface-2:       #1d1d1b;
+  --border:          rgba(255,255,255,0.10);
+  --border-mid:      rgba(255,255,255,0.18);
+  --text:            #f0ede8;
+  --text-2:          #c8c4be;
+  --text-muted:      #8a8682;
+  --text-dim:        #5a5652;
+  --accent:          #f0ede8;
+  --accent-inv:      #0c0c0b;
+  --accent-green:    #7ecb7e;
+  --accent-green-bg: rgba(126,203,126,0.10);
+  --accent-blue:     #7aa2ff;
+  --accent-blue-bg:  rgba(122,162,255,0.14);
+  --tag-bg:          rgba(255,255,255,0.07);
+  --tag-border:      rgba(255,255,255,0.12);
+  --tag-text:        #b0aca8;
+  --shadow:          0 1px 3px rgba(0,0,0,0.35), 0 4px 16px rgba(0,0,0,0.25);
+  --shadow-hover:    0 4px 28px rgba(0,0,0,0.45), 0 1px 3px rgba(0,0,0,0.25);
+  --marquee-sep:     #3a3835;
+  --nav-bg:          rgba(12,12,11,0.92);
+  --input-bg:        #1a1a18;
+  --input-placeholder: #5a5652;
+  color-scheme: dark;
+}
+
+/* ============================================================
+   THEME — smooth, reliable crossfade on every browser.
+
+   This single global rule is what animates a theme switch, end to end.
+   Deliberately not using the View Transitions API: this page's smooth-scroll
+   layer mutates a `transform` on the content wrapper every animation frame,
+   and starting a View Transition snapshot while that's running is a race —
+   depending on the exact frame captured mid-mutation, the crossfade can
+   stall or only complete cleanly in one direction. A plain CSS transition on
+   color-related properties has no such race and behaves identically
+   everywhere.
+   ============================================================ */
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  transition: background-color 0.45s ease, color 0.45s ease;
+  /* Offsets anchor targets so the fixed navbar never covers a heading. */
+  scroll-padding-top: calc(var(--nav-h) + 16px);
+  /*
+   * Native anchor jumps (keyboard Page-Down, focus scrolling, a plain <a
+   * href="#..."> with no JS) get the browser's own smooth curve. On desktop,
+   * SmoothScroll.tsx switches this to `auto` the moment its own animation
+   * loop takes over, because layering the browser's smoothing UNDER our own
+   * per-frame easing double-damps every scroll — that compounding is what
+   * made scrolling feel sluggish and "stuck" rather than liquid. Touch
+   * devices never touch this override, so anchor taps there stay smooth.
+   */
+  scroll-behavior: smooth;
+}
+
+/*
+ * Disables the elastic rubber-band bounce past the top/bottom of the page.
+ * Without this, overscrolling (trackpad momentum, some mice's smooth-scroll
+ * drivers, Windows' own elastic scroll) drags the whole visual viewport —
+ * including position:fixed content — down past its edge for an instant,
+ * exposing bare <body> background beneath it. Since the last section's
+ * background (var(--surface)) differs from <body>'s own background
+ * (var(--bg)), that bounce briefly showed a visibly different-colored strip
+ * below the footer. This removes the bounce outright rather than trying to
+ * color-match every possible edge.
+ */
+html, body { overscroll-behavior-y: auto; }
+
+/*
+ * Belt-and-suspenders for the footer-gap bug: `overscroll-behavior-y: none`
+ * above is the real fix, but it isn't honoured by every browser/OS scroll
+ * driver equally. Giving <html> the same background as <body> means that
+ * even if some edge case still exposes a sliver beneath the fixed
+ * smooth-scroll layer, it's the same cream/near-black as everything else —
+ * invisible — rather than the browser's default white.
+ */
+html { background: var(--bg); }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100%;
+}
+
+/* A restrained liquid sheen that adds motion without changing the layout. */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: -24%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 18% 24%, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0) 34%),
+    radial-gradient(ellipse at 82% 68%, rgba(45,91,255,0.08) 0%, rgba(45,91,255,0) 30%),
+    radial-gradient(ellipse at 52% 108%, rgba(42,106,42,0.06) 0%, rgba(42,106,42,0) 28%);
+  filter: blur(30px);
+  opacity: 0.7;
+  animation: liquid-sheen 24s ease-in-out infinite alternate;
+}
+
+body::after {
+  background:
+    radial-gradient(ellipse at 78% 18%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 26%),
+    radial-gradient(ellipse at 24% 82%, rgba(45,91,255,0.05) 0%, rgba(45,91,255,0) 30%);
+  opacity: 0.45;
+  animation-duration: 31s;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes liquid-sheen {
+  0% { transform: translate3d(-2%, -1%, 0) scale(1); }
+  100% { transform: translate3d(2%, 1%, 0) scale(1.06); }
+}
+
+[data-theme="dark"] body::before,
+[data-theme="dark"] body::after {
+  opacity: 0.22;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after { animation: none; }
+}
+
+/* ------------------------------------------------------------
+   HORIZONTAL OVERFLOW GUARD
+
+   `overflow-x: hidden` on <html> or <body> silently turns them into
+   scroll containers, which breaks every `position: sticky` descendant
+   (this is why the sub-page navbars weren't sticking). `overflow: clip`
+   does the same visual job WITHOUT creating a scroll container, so
+   sticky keeps working. The hidden fallback only applies to browsers
+   that don't support clip.
+   ------------------------------------------------------------ */
+html, body { max-width: 100%; }
+
+@supports (overflow: clip) {
+  html, body { overflow-x: clip; }
+}
+@supports not (overflow: clip) {
+  html, body { overflow-x: hidden; }
+}
+
+section, main, footer, header { max-width: 100%; }
+@supports (overflow: clip) { section { overflow-x: clip; } }
+@supports not (overflow: clip) { section { overflow-x: hidden; } }
+
+/* Never let a long word or URL push the layout sideways. */
+h1, h2, h3, h4, h5, h6, p, a, span, li, label { overflow-wrap: break-word; }
+
+img, svg, video, canvas { max-width: 100%; height: auto; }
+svg { height: auto; }
+
+::selection { background: var(--text); color: var(--bg); }
+
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--text-dim); border-radius: 2px; }
+
+/* ============================================================
+   CUSTOM CURSOR — only on real mouse-driven devices.
+   Scoping this prevents phones/tablets from ever ending up with an
+   invisible cursor and no replacement.
+   ============================================================ */
+.cur-dot, .cur-ring { display: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  body, a, button { cursor: none; }
+
+  .cur-dot {
+    display: block;
+    position: fixed;
+    width: 5px; height: 5px;
+    background: var(--text);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: background 0.3s;
+  }
+
+  .cur-ring {
+    display: block;
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid var(--text-muted);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width 0.35s cubic-bezier(0.23,1,0.32,1),
+                height 0.35s cubic-bezier(0.23,1,0.32,1),
+                border-color 0.3s, background 0.3s;
+  }
+
+  .cur-ring.expand {
+    width: 52px; height: 52px;
+    border-color: var(--text);
+    background: rgba(0,0,0,0.04);
+  }
+  [data-theme="dark"] .cur-ring.expand { background: rgba(255,255,255,0.04); }
+}
+
+/* ============================================================
+   FORM INPUTS — cross-theme visibility
+   ============================================================ */
+input, textarea, select {
+  background: var(--input-bg) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+  font-family: inherit;
+  /* 16px minimum stops iOS Safari zooming in on focus. */
+  font-size: max(16px, 1em);
+  max-width: 100%;
+}
+input::placeholder, textarea::placeholder {
+  color: var(--input-placeholder) !important;
+  opacity: 1;
+}
+input:focus, textarea:focus {
+  border-color: var(--border-mid) !important;
+  outline: none;
+}
+
+/* Keyboard accessibility — visible focus ring for tab users. */
+:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============================================================
+   THEME — smooth color transitions
+   ============================================================ */
+/*
+ * `opacity` deliberately left out of this list. Applied universally, it
+ * doesn't just crossfade the theme — it tacks an extra 0.45s onto *any*
+ * opacity change anywhere on the page (scroll-reveal animations, menu
+ * open/close, hover states), which reads as random, unrelated lag that has
+ * nothing to do with switching themes. Color-related properties are enough
+ * to crossfade the theme cleanly on their own.
+ */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0.45s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   TYPOGRAPHY UTILITIES
+   ============================================================ */
+.font-display { font-family: 'DM Serif Display', 'Georgia', serif; }
+.font-sans    { font-family: 'Inter', system-ui, sans-serif; }
+
+/* ============================================================
+   MARQUEE
+   ============================================================ */
+.marquee-wrap { overflow: hidden; }
+.marquee-inner {
+  display: flex;
+  width: max-content;
+  animation: marq 28s linear infinite;
+}
+.marquee-inner.rev { animation-direction: reverse; animation-duration: 32s; }
+@keyframes marq {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   REVEAL ANIMATIONS
+   ============================================================ */
+.reveal {
+  opacity: 0; transform: translateY(32px);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+.reveal-left {
+  opacity: 0; transform: translateX(-28px);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal-left.in { opacity: 1; transform: translateX(0); }
+
+.reveal-right {
+  opacity: 0; transform: translateX(28px);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal-right.in { opacity: 1; transform: translateX(0); }
+
+.reveal-scale {
+  opacity: 0; transform: scale(0.94);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal-scale.in { opacity: 1; transform: scale(1); }
+
+.d1 { transition-delay: 0.05s; }
+.d2 { transition-delay: 0.12s; }
+.d3 { transition-delay: 0.19s; }
+.d4 { transition-delay: 0.26s; }
+.d5 { transition-delay: 0.33s; }
+.d6 { transition-delay: 0.40s; }
+
+/* ============================================================
+   LAYOUT HELPERS
+   ============================================================ */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-inline: var(--container-pad);
+}
+
+/* Page shell used by /skills and /projects */
+.page-shell {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.page-main {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-inline: var(--container-pad);
+  padding-top: clamp(32px, 6vw, 60px);
+  padding-bottom: clamp(64px, 10vw, 100px);
+}
+
+/* ============================================================
+   FIXED SUB-PAGE HEADER
+
+   Uses `position: fixed` rather than `sticky`. Fixed positioning is
+   immune to ancestor overflow/transform contexts, so the navbar stays
+   pinned in every browser including older Samsung Internet and iOS.
+   ============================================================ */
+.page-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-inline: var(--container-pad);
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--border);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  backdrop-filter: blur(16px) saturate(1.6);
+}
+
+/* Opaque fallback where backdrop-filter is unsupported, so text stays legible. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .page-header { background: var(--bg); }
+}
+
+/* Spacer that replaces the height the fixed header no longer occupies. */
+.page-header-offset { height: var(--nav-h); flex: none; }
+
+/* ============================================================
+   TAG CHIP — visible in both themes
+   ============================================================ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: var(--tag-bg);
+  border: 1px solid var(--tag-border);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--tag-text);
+  letter-spacing: 0.02em;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .chip {
+  color: var(--text-muted);
+  border-color: rgba(255,255,255,0.14);
+}
+
+/* Shared skill chip — identical on the home section and the /skills page. */
+.skill-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 11px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: default;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.skill-chip:hover {
+  border-color: var(--border-mid);
+  background: var(--surface-2);
+}
+
+/* Shared card shell for skills / certificates / achievements. */
+.panel {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  background: var(--surface);
+  height: 100%;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.panel:hover {
+  border-color: var(--border-mid);
+  box-shadow: var(--shadow);
+}
+
+/* ============================================================
+   RESPONSIVE GRIDS
+
+   `auto-fit` + `minmax` means these reflow at ANY viewport width
+   rather than only at hard-coded breakpoints. `min()` keeps the
+   track from ever exceeding the available width on narrow screens.
+   ============================================================ */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.skills-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 16px;
+}
+
+.timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 16px;
+}
+
+.scrollable-panel {
+  max-height: 720px;
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: auto;
+  touch-action: pan-y;
+}
+
+@media (min-width: 1024px) {
+  .scrollable-panel {
+    max-height: 460px;
+  }
+}
+
+.proj-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 20px;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 80px;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 64px;
+}
+
+.about-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.about-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+}
+
+.contact-name-email {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 1024px) {
+  .skills-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .about-grid   { grid-template-columns: 1fr; gap: 48px; }
+  .contact-grid { grid-template-columns: 1fr; gap: 44px; }
+  .timeline-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .skills-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .about-info-grid    { grid-template-columns: 1fr; }
+  .contact-name-email { grid-template-columns: 1fr; }
+}
+/* Stats stay 3-up but shrink; below 360px they wrap to 2. */
+@media (max-width: 359px) {
+  .about-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ============================================================
+   SKELETON — used while portfolio data loads from the API
+   ============================================================ */
+.skeleton {
+  background: var(--border);
+  border-radius: 6px;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+  max-width: 100%;
+}
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+/* ============================================================
+   SECTION LABEL / DIVIDER
+   ============================================================ */
+.section-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.divider { width: 100%; height: 1px; background: var(--border); }
+
+/* ============================================================
+   SECTION RHYTHM — fluid, no hard jumps
+   ============================================================ */
+section:not(#home) {
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y-sm);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+#home {
+  /* dvh where supported, vh fallback for older browsers. */
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: calc(var(--nav-h) + 24px);
+  padding-bottom: clamp(48px, 7vw, 72px);
+}
+
+@media (max-width: 767px) {
+  #home {
+    justify-content: flex-end;
+  }
+  .hero-float-label { display: none !important; }
+  .scroll-ind { display: none !important; }
+
+  /* 3 icon buttons + View Projects on row 1; Hire Me + Skills on row 2. */
+  .hero-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 38px 38px 38px minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
+  }
+  .hero-actions > a:nth-child(4) { grid-column: 4 / 5; justify-content: center; }
+  .hero-actions > a:nth-child(5) { grid-column: 1 / 3; justify-content: center; }
+  .hero-actions > a:nth-child(6) { grid-column: 3 / 5; justify-content: center; }
+}
+
+/* Short landscape phones — let the hero shrink instead of clipping. */
+@media (max-height: 520px) and (orientation: landscape) {
+  #home {
+    min-height: auto;
+    padding-top: calc(var(--nav-h) + 32px);
+    padding-bottom: 48px;
+  }
+  .hero-logo-carousel { display: none !important; }
+}
+
+/* ============================================================
+   PROJECTS
+   ============================================================ */
+.proj-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 20px;
+}
+@media (max-width: 767px) {
+  .proj-highlights { max-height: 200px !important; opacity: 1 !important; }
+}
+@media (max-width: 640px) {
+  .proj-row { grid-template-columns: 1fr; gap: 6px; }
+  .proj-links { flex-wrap: wrap; }
+}
+
+/* ============================================================
+   CONTACT / FOOTER
+   ============================================================ */
+@media (max-width: 480px) {
+  .footer-nav { gap: 14px; flex-wrap: wrap; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+@media (min-width: 768px) { .mob-nav { display: none !important; } }
+@media (max-width: 767px) { .desk-nav { display: none !important; } }
+
+@media (max-width: 480px)  { .desk-divider { display: none !important; } }
+
+/* ============================================================
+   TOUCH TARGETS — WCAG-friendly hit areas on coarse pointers
+   ============================================================ */
+@media (pointer: coarse) {
+  a, button { -webkit-tap-highlight-color: transparent; }
+  nav a, header button { min-height: 44px; display: inline-flex; align-items: center; }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   PRINT
+   ============================================================ */
+@media print {
+  .cur-dot, .cur-ring, .page-header, header, .scroll-ind { display: none !important; }
+  body { background: #fff; color: #000; }
+}
