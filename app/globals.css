@@ -296,59 +296,17 @@ input:focus, textarea:focus {
 }
 
 /* ============================================================
-   TYPOGRAPHY UTILITIES
-   ============================================================ */
-.font-display { font-family: 'DM Serif Display', 'Georgia', serif; }
-.font-sans    { font-family: 'Inter', system-ui, sans-serif; }
-
-/* ============================================================
    MARQUEE
    ============================================================ */
-.marquee-wrap { overflow: hidden; }
 .marquee-inner {
   display: flex;
   width: max-content;
   animation: marq 28s linear infinite;
 }
-.marquee-inner.rev { animation-direction: reverse; animation-duration: 32s; }
 @keyframes marq {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
-
-/* ============================================================
-   REVEAL ANIMATIONS
-   ============================================================ */
-.reveal {
-  opacity: 0; transform: translateY(32px);
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
-}
-.reveal.in { opacity: 1; transform: translateY(0); }
-
-.reveal-left {
-  opacity: 0; transform: translateX(-28px);
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
-}
-.reveal-left.in { opacity: 1; transform: translateX(0); }
-
-.reveal-right {
-  opacity: 0; transform: translateX(28px);
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
-}
-.reveal-right.in { opacity: 1; transform: translateX(0); }
-
-.reveal-scale {
-  opacity: 0; transform: scale(0.94);
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
-}
-.reveal-scale.in { opacity: 1; transform: scale(1); }
-
-.d1 { transition-delay: 0.05s; }
-.d2 { transition-delay: 0.12s; }
-.d3 { transition-delay: 0.19s; }
-.d4 { transition-delay: 0.26s; }
-.d5 { transition-delay: 0.33s; }
-.d6 { transition-delay: 0.40s; }
 
 /* ============================================================
    LAYOUT HELPERS
@@ -436,75 +394,8 @@ input:focus, textarea:focus {
   text-transform: uppercase;
 }
 
-/* ============================================================
-   ROUTE TRANSITION
-   ============================================================ */
-.route-transition-root {
-  position: relative;
-  isolation: isolate;
-}
-
-.route-transition-wash {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  pointer-events: none;
-  background: var(--text);
-  color: var(--bg);
-  transform: translateY(102%);
-  transform-origin: bottom;
-  transition: transform 0.72s cubic-bezier(0.76, 0, 0.24, 1);
-}
-
-.route-transition-wash.covering {
-  transform: translateY(0);
-  transition-duration: 0.46s;
-}
-
-.route-transition-wash.revealing {
-  transform: translateY(-102%);
-  transform-origin: top;
-  transition-delay: 0.08s;
-}
-
-.route-transition-kicker {
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  opacity: 0.55;
-}
-
-.route-transition-title {
-  font-family: 'DM Serif Display', Georgia, serif;
-  font-size: clamp(34px, 7vw, 76px);
-  line-height: 0.95;
-}
-
-.route-transition-rule {
-  width: min(180px, 32vw);
-  height: 1px;
-  margin-top: 8px;
-  background: currentColor;
-  transform-origin: left;
-  animation: route-rule 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes route-rule {
-  from { transform: scaleX(0); opacity: 0; }
-  to { transform: scaleX(1); opacity: 0.5; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .site-loader { transition-duration: 0.01ms !important; }
-  .route-transition-wash { transition-duration: 0.01ms !important; }
-  .route-transition-rule { animation: none; }
 }
 
 /* ============================================================
@@ -616,12 +507,6 @@ input:focus, textarea:focus {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: 16px;
-}
-
-.timeline-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
 }
 
 .about-timeline-columns {
@@ -799,7 +684,6 @@ input:focus, textarea:focus {
     gap: 48px;
   }
   .contact-grid { grid-template-columns: 1fr; gap: 44px; }
-  .timeline-grid,
   .about-timeline-columns { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
@@ -843,8 +727,6 @@ input:focus, textarea:focus {
   color: var(--text-muted);
 }
 
-.divider { width: 100%; height: 1px; background: var(--border); }
-
 /* ============================================================
    SECTION RHYTHM — fluid, no hard jumps
    ============================================================ */
@@ -868,7 +750,6 @@ section:not(#home) {
   #home {
     justify-content: flex-end;
   }
-  .hero-float-label { display: none !important; }
   .scroll-ind {
     right: 16px !important;
     bottom: 22px !important;
@@ -931,8 +812,6 @@ section:not(#home) {
    ============================================================ */
 @media (min-width: 768px) { .mob-nav { display: none !important; } }
 @media (max-width: 767px) { .desk-nav { display: none !important; } }
-
-@media (max-width: 480px)  { .desk-divider { display: none !important; } }
 
 /* ============================================================
    TOUCH TARGETS — WCAG-friendly hit areas on coarse pointers
