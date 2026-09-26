@@ -22,17 +22,6 @@ function writeStoredTheme(theme: Theme) {
   }
 }
 
-function systemTheme(): Theme {
-  try {
-    return typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
-  } catch {
-    return 'dark';
-  }
-}
-
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
   root.setAttribute('data-theme', theme);
@@ -44,7 +33,7 @@ function applyTheme(theme: Theme) {
 }
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<Theme>('dark');
   const [mounted, setMounted] = useState(false);
   const [animating, setAnimating] = useState(false);
 
@@ -53,31 +42,10 @@ export default function ThemeToggle() {
   useEffect(() => {
     const attr = document.documentElement.getAttribute('data-theme');
     const initial: Theme =
-      attr === 'dark' || attr === 'light' ? attr : readStoredTheme() ?? systemTheme();
+      attr === 'dark' || attr === 'light' ? attr : readStoredTheme() ?? 'dark';
     setTheme(initial);
     applyTheme(initial);
     setMounted(true);
-  }, []);
-
-  // Follow the OS setting while the visitor hasn't explicitly chosen a theme.
-  useEffect(() => {
-    if (typeof window.matchMedia !== 'function') return;
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-
-    const onChange = (e: MediaQueryListEvent) => {
-      if (readStoredTheme()) return;
-      const next: Theme = e.matches ? 'dark' : 'light';
-      setTheme(next);
-      applyTheme(next);
-    };
-
-    // Safari < 14 only supports the deprecated addListener API.
-    if (typeof mq.addEventListener === 'function') {
-      mq.addEventListener('change', onChange);
-      return () => mq.removeEventListener('change', onChange);
-    }
-    mq.addListener(onChange);
-    return () => mq.removeListener(onChange);
   }, []);
 
   // Keep multiple open tabs in sync.

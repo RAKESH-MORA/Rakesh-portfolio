@@ -184,6 +184,8 @@ const ALL_LOGOS = [
   },
 ];
 
+// Kept isolated for backwards-compatible asset data; the hero no longer renders this carousel.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function LogoNetwork() {
   const stripLogos = ALL_LOGOS.map(logo => logo.name);
 
@@ -216,8 +218,25 @@ export default function Hero() {
       paddingBottom: 'clamp(28px, 5vh, 48px)',
       boxSizing: 'border-box',
     }}>
-      <LogoNetwork />
-
+      <div
+        className="hero-background"
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: 'none',
+          opacity: 0.2,
+          backgroundImage: 'url("/background.jpg")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+          backgroundRepeat: 'no-repeat',
+          transform: 'translate3d(0, calc(var(--scroll-y, 0px) * -0.28), 0) scale(1.22)',
+          transformOrigin: 'center center',
+          willChange: 'transform',
+        }}
+      />
       {/* ── Main content ── */}
       <div className="container" style={{ position: 'relative', zIndex: 2, width: '100%', boxSizing: 'border-box' }}>
 
@@ -327,7 +346,7 @@ export default function Hero() {
 
       {/* Scroll indicator */}
       <div className="scroll-ind" style={{
-        position: 'absolute', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
+        position: 'absolute', bottom: 'clamp(22px, 5vh, 40px)', right: 'clamp(16px, 4vw, 40px)', transform: 'none',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
         animation: 'fadeInUp 1s 1.2s both', zIndex: 1,
       }}>
@@ -348,121 +367,9 @@ export default function Hero() {
           100% { height: 0;    top: 44px; }
         }
         @keyframes fadeInUp {
-          from { opacity: 0; transform: translateX(-50%) translateY(12px); }
-          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes marqueeUp {
-          0% { transform: translateY(0); }
-          100% { transform: translateY(-50%); }
-        }
-        @keyframes marqueeHorizontal {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-
-        .hero-logo-strip {
-          position: absolute;
-          right: clamp(48px, 4vw, 110px);
-          top: 50%;
-          transform: translateY(-50%);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          z-index: 1;
-          pointer-events: none;
-          width: 120px;
-          height: min(68vh, 560px);
-          overflow: hidden;
-          mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.95) 10%, rgba(0,0,0,1) 45%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.95) 90%, transparent 100%);
-          -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.95) 10%, rgba(0,0,0,1) 45%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.95) 90%, transparent 100%);
-        }
-
-        .hero-logo-marquee {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 16px;
-          width: 100%;
-          min-width: max-content;
-          will-change: transform;
-        }
-
-        .hero-logo-marquee-up {
-          animation: marqueeUp 40s linear infinite;
-        }
-
-        .hero-strip-logo {
-          position: relative;
-          width: clamp(62px, 4.5vw, 92px);
-          height: clamp(62px, 4.5vw, 92px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 18px;
-          background: transparent;
-          border: none;
-          box-shadow: none;
-          overflow: visible;
-          filter: grayscale(100%) brightness(0.9) drop-shadow(0 8px 18px rgba(0,0,0,0.12));
-          opacity: 0.86;
-        }
-
-        .hero-strip-logo-inner {
-          position: relative;
-          z-index: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 78%;
-          height: 78%;
-          color: var(--text);
-        }
-
-        .hero-strip-logo-inner svg {
-          width: 100%;
-          height: 100%;
-        }
-
-        @media (max-width: 768px) {
-          #home {
-            padding-top: clamp(60px, 8vh, 100px) !important;
-            padding-left: clamp(16px, 4vw, 24px) !important;
-            padding-right: clamp(16px, 4vw, 24px) !important;
-            padding-bottom: clamp(20px, 4vh, 40px) !important;
-          }
-          .hero-logo-strip {
-            position: static;
-            transform: none;
-            margin: 0 auto 22px;
-            width: min(96vw, 560px);
-            height: 124px;
-            overflow: hidden;
-            mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.95) 8%, rgba(0,0,0,1) 22%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.95) 92%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.95) 8%, rgba(0,0,0,1) 22%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.95) 92%, transparent 100%);
-          }
-
-          .hero-logo-marquee {
-            flex-direction: row;
-            align-items: center;
-            gap: 14px;
-            width: max-content;
-            min-width: max-content;
-            animation: marqueeHorizontal 30s linear infinite;
-          }
-
-          .hero-strip-logo {
-            width: clamp(58px, 14vw, 76px);
-            height: clamp(58px, 14vw, 76px);
-          }
-
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .hero-logo-orbit,
-          .hero-orbit-list,
-          .hero-orbit-item { animation: none !important; }
-        }
-
         @media (max-width: 480px) {
           #home {
             padding-top: clamp(48px, 6vh, 80px) !important;

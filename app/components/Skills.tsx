@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import Reveal from './Reveal';
 import { allStrengths } from '../data/projects';
-import { useApiData } from '../hooks/useApiData';
+import { usePortfolioSection } from '../context/PortfolioDataContext';
 import type { SkillCategoryDTO } from '@/types/portfolio';
 
 function SkillGroupSkeleton({ index }: { index: number }) {
@@ -86,8 +86,11 @@ export function CoreStrengths({ style }: { style?: React.CSSProperties }) {
 }
 
 export default function Skills() {
-  const { data, loading, error } = useApiData<SkillCategoryDTO[]>('/api/skills?limit=4');
-  const featuredGroups = data ?? [];
+  // Full skill list comes from the shared /api/portfolio cache (fetched
+  // once for the whole site); only the first 4 categories are shown here,
+  // matching what the old `?limit=4` query param used to do server-side.
+  const { data, loading, error } = usePortfolioSection('skills');
+  const featuredGroups: SkillCategoryDTO[] = (data ?? []).slice(0, 4);
 
   return (
     <section id="skills">

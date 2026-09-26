@@ -2,9 +2,9 @@
 import CustomCursor from '../components/CustomCursor';
 import PageHeader from '../components/PageHeader';
 import Reveal from '../components/Reveal';
+import SmoothScroll from '../components/SmoothScroll';
 import { SkillCard, CoreStrengths } from '../components/Skills';
-import { useApiData } from '../hooks/useApiData';
-import type { SkillCategoryDTO } from '@/types/portfolio';
+import { usePortfolioSection } from '../context/PortfolioDataContext';
 
 function SkillGroupSkeleton({ index }: { index: number }) {
   return (
@@ -22,16 +22,17 @@ function SkillGroupSkeleton({ index }: { index: number }) {
 }
 
 export default function SkillsPage() {
-  const { data, loading, error } = useApiData<SkillCategoryDTO[]>('/api/skills');
+  const { data, loading, error } = usePortfolioSection('skills');
   const allSkillGroups = data ?? [];
 
   return (
     <>
       <CustomCursor />
-      <div className="page-shell">
-        <PageHeader />
+      <SmoothScroll>
+        <div className="page-shell">
+          <PageHeader />
 
-        <main className="page-main">
+          <main className="page-main">
           {/* Page header */}
           <div style={{ marginBottom: 'clamp(36px, 6vw, 56px)' }}>
             <p className="section-label" style={{ marginBottom: '16px' }}>— Complete Toolkit</p>
@@ -82,8 +83,9 @@ export default function SkillsPage() {
           <Reveal direction="up" delay={120}>
             <CoreStrengths />
           </Reveal>
-        </main>
-      </div>
+          </main>
+        </div>
+      </SmoothScroll>
     </>
   );
 }

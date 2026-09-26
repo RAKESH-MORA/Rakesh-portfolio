@@ -1,6 +1,7 @@
 'use client';
+import Image from 'next/image';
 import Reveal from './Reveal';
-import { useApiData } from '../hooks/useApiData';
+import { usePortfolioSection } from '../context/PortfolioDataContext';
 import type { ExperienceDTO } from '@/types/portfolio';
 
 function TimelineSkeleton() {
@@ -37,7 +38,7 @@ function TimelineGroup({ title, items }: { title: string; items: ExperienceDTO[]
       <div className="about-timeline-scroll scrollable-panel">
         <div className="about-timeline-list">
           {items.map((item, i) => (
-            <Reveal key={item.id} direction="up" delay={i * 80}>
+            <Reveal key={item.id} direction={title === 'Experience' ? 'left' : 'right'} delay={i * 80}>
               <div className="about-timeline-item">
                 <span className="about-timeline-dot" />
                 <div
@@ -85,14 +86,26 @@ export default function About() {
     data: timelineData,
     loading: timelineLoading,
     error: timelineError,
-  } = useApiData<ExperienceDTO[]>('/api/experience');
+  } = usePortfolioSection('experience');
   const timeline = timelineData ?? [];
   const experience = timeline.filter(item => item.type === 'work');
   const education = timeline.filter(item => item.type === 'edu');
 
   return (
-    <section id="about" style={{ background: 'var(--surface)' }}>
-      <div className="container">
+    <section id="about" style={{ background: 'var(--surface)', position: 'relative', overflow: 'hidden' }}>
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none',
+          opacity: 0.10,
+          backgroundImage: 'url("/about_image.jpg")',
+          backgroundSize: 'cover', backgroundPosition: 'center',
+          backgroundAttachment: 'fixed', backgroundRepeat: 'no-repeat',
+          transform: 'translate3d(0, calc(var(--scroll-y, 0px) * -0.06), 0) scale(1.12)',
+          willChange: 'transform',
+        }}
+      />
+      <div className="container" style={{ position: 'relative', zIndex: 1 }}>
 
         {/* Section header */}
         <Reveal direction="up">
@@ -175,7 +188,15 @@ export default function About() {
           {/* Full image on the right on desktop */}
           <Reveal className="about-image-column" direction="right">
             <a className="about-image-link" href="#" aria-label="Open profile image">
-              <img className="about-image" src="/Professional%20Office%20Portrait.png" alt="Rakesh Mora" />
+              <Image
+                className="about-image"
+                src="/Professional%20Office%20Portrait.png"
+                alt="Rakesh Mora"
+                width={700}
+                height={930}
+                sizes="(max-width: 900px) 100vw, 50vw"
+                priority
+              />
             </a>
           </Reveal>
 

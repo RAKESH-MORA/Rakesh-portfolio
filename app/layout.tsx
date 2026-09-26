@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "Rakesh Mora — Full Stack Developer",
@@ -44,11 +45,7 @@ const THEME_SCRIPT = `
     var saved = localStorage.getItem('theme');
     if (saved === 'dark' || saved === 'light') theme = saved;
   } catch (e) {}
-  if (!theme) {
-    try {
-      theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    } catch (e) { theme = 'dark'; }
-  }
+  if (!theme) theme = 'dark';
   apply(theme);
 })();
 `;
@@ -79,7 +76,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

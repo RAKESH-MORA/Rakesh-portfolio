@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Reveal from './Reveal';
-import { useApiData } from '../hooks/useApiData';
+import { usePortfolioSection } from '../context/PortfolioDataContext';
 import type { ProjectDTO } from '@/types/portfolio';
 
 function ProjectRowSkeleton({ index }: { index: number }) {
@@ -162,8 +162,11 @@ function ProjectRow({ project, index }: { project: ProjectDTO; index: number }) 
 }
 
 export default function Projects() {
-  const { data, loading, error } = useApiData<ProjectDTO[]>('/api/projects?featured=true&limit=3');
-  const featuredProjects = data ?? [];
+  // Sourced from the shared /api/portfolio cache; featured + first-3
+  // filtering (previously `?featured=true&limit=3` server-side) now
+  // happens client-side against the already-fetched full list.
+  const { data, loading, error } = usePortfolioSection('projects');
+  const featuredProjects: ProjectDTO[] = (data ?? []).filter((p) => p.featured).slice(0, 3);
 
   return (
     <section id="projects">

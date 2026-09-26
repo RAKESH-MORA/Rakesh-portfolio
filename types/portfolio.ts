@@ -19,6 +19,7 @@ export interface ProjectDTO {
   year: string;
   category: string;
   highlights: string[];
+  featured: boolean;
 }
 
 export interface SkillCategoryDTO {

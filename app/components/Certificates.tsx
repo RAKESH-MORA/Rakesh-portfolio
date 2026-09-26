@@ -1,6 +1,6 @@
 'use client';
 import Reveal from './Reveal';
-import { useApiData } from '../hooks/useApiData';
+import { usePortfolioSection } from '../context/PortfolioDataContext';
 import type { CertificateDTO, AchievementDTO } from '@/types/portfolio';
 
 /* ── Shared bits ─────────────────────────────────────────────────────────── */
@@ -197,7 +197,7 @@ export default function Certificates() {
     data: certData,
     loading: certLoading,
     error: certError,
-  } = useApiData<CertificateDTO[]>('/api/certificates');
+  } = usePortfolioSection('certificates');
   const certificates = certData ?? [];
   const showCertScroll = certificates.length > 3;
 
@@ -205,7 +205,7 @@ export default function Certificates() {
     data: achData,
     loading: achLoading,
     error: achError,
-  } = useApiData<AchievementDTO[]>('/api/achievements');
+  } = usePortfolioSection('achievements');
   const achievements = achData ?? [];
   const showAchievementScroll = achievements.length > 3;
 
@@ -218,7 +218,7 @@ export default function Certificates() {
       <div className="container">
 
         {/* Section header */}
-        <Reveal direction="up">
+        <Reveal direction="left">
           <div style={{
             display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
             marginBottom: 'clamp(40px, 6vw, 72px)', flexWrap: 'wrap', gap: '24px',
@@ -276,7 +276,7 @@ export default function Certificates() {
               {certLoading
                 ? [0, 1, 2].map(i => <CardSkeleton key={i} index={i} />)
                 : certificates.map((c, i) => (
-                    <Reveal key={c.id} direction="up" delay={i * 60} style={{ height: '100%' }}>
+                    <Reveal key={c.id} direction="left" delay={i * 60} style={{ height: '100%' }}>
                       <CertificateCard cert={c} />
                     </Reveal>
                   ))}
@@ -302,7 +302,7 @@ export default function Certificates() {
         {/* ── Achievements ── */}
         {showAchievements && (
           <>
-            <Reveal direction="up">
+            <Reveal direction="right">
               <SubHeading title="Achievements" count={achLoading ? null : achievements.length} />
             </Reveal>
 
@@ -328,7 +328,7 @@ export default function Certificates() {
                   {achLoading
                     ? [0, 1, 2].map(i => <CardSkeleton key={i} index={i} />)
                     : achievements.map((a, i) => (
-                        <Reveal key={a.id} direction="up" delay={i * 60} style={{ height: '100%' }}>
+                        <Reveal key={a.id} direction="right" delay={i * 60} style={{ height: '100%' }}>
                           <AchievementCard item={a} />
                         </Reveal>
                       ))}

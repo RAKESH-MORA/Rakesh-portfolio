@@ -1,4 +1,28 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
+
+/**
+ * Prefer IPv4 when resolving DNS. Node.js 18+ changed its default DNS
+ * result ordering, and on a number of networks/resolvers that causes the
+ * SRV lookup `mongodb+srv://` URIs depend on (`_mongodb._tcp.<cluster>...`)
+ * to time out or get refused (`querySrv ETIMEOUT` / `ECONNREFUSED`) even
+ * though the cluster and credentials are fine. Forcing IPv4-first is the
+ * standard fix and is safe everywhere — it only affects the order two
+ * equally-valid answers are tried in.
+ */
+dns.setDefaultResultOrder('ipv4first');
+
+/**
+ * Optional escape hatch: if a host's default DNS resolver can't resolve
+ * SRV records at all (some corporate networks / VPNs / restrictive
+ * firewalls block them outright), set MONGODB_DNS_SERVERS to a
+ * comma-separated list of resolvers known to work, e.g.
+ *   MONGODB_DNS_SERVERS=8.8.8.8,1.1.1.1
+ */
+const customDnsServers = process.env.MONGODB_DNS_SERVERS?.split(',').map((s) => s.trim()).filter(Boolean);
+if (customDnsServers?.length) {
+  dns.setServers(customDnsServers);
+}
 
 /**
  * A cached MongoDB connection.
@@ -66,8 +90,18 @@ export async function connectDB(): Promise<typeof mongoose> {
       .connect(MONGODB_URI, {
         // Keep the pool small but non-trivial; tune via env if needed later.
         maxPoolSize: 10,
-        serverSelectionTimeoutMS: 10000,
+        // Atlas free/shared-tier clusters (M0/M2/M5) pause after a period
+        // of inactivity and can take 30-60s to resume on the very first
+        // connection after being idle — that's a "ReplicaSetNoPrimary /
+        // could not connect to any servers" error that then succeeds on
+        // its own a bit later, not a real outage or whitelist block. A
+        // short timeout here would just fail that first request for no
+        // reason, so we give it real room; override via env if you're on
+        // an always-on cluster and want faster failures instead.
+        serverSelectionTimeoutMS: Number(process.env.MONGODB_SERVER_SELECTION_TIMEOUT_MS) || 45000,
+        connectTimeoutMS: Number(process.env.MONGODB_SERVER_SELECTION_TIMEOUT_MS) || 45000,
         bufferCommands: false,
+        family: 4, // pair with dns.setDefaultResultOrder('ipv4first') above
       })
       .then((m) => m);
   }

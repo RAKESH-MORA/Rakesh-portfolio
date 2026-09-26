@@ -2,7 +2,8 @@
 import { useMemo, useState } from 'react';
 import CustomCursor from '../components/CustomCursor';
 import PageHeader from '../components/PageHeader';
-import { useApiData } from '../hooks/useApiData';
+import SmoothScroll from '../components/SmoothScroll';
+import { usePortfolioSection } from '../context/PortfolioDataContext';
 import type { ProjectDTO } from '@/types/portfolio';
 
 function ProjectCardSkeleton({ index }: { index: number }) {
@@ -157,7 +158,7 @@ function ProjectCard({ project, index }: { project: ProjectDTO; index: number })
 }
 
 export default function ProjectsPage() {
-  const { data, loading, error } = useApiData<ProjectDTO[]>('/api/projects');
+  const { data, loading, error } = usePortfolioSection('projects');
   const allProjects = useMemo(() => data ?? [], [data]);
   const [activeCategory, setActiveCategory] = useState('All');
 
@@ -173,10 +174,11 @@ export default function ProjectsPage() {
   return (
     <>
       <CustomCursor />
-      <div className="page-shell">
-        <PageHeader />
+      <SmoothScroll>
+        <div className="page-shell">
+          <PageHeader />
 
-        <main className="page-main">
+          <main className="page-main">
 
           {/* Page header */}
           <div style={{ marginBottom: 'clamp(36px, 6vw, 56px)' }}>
@@ -250,8 +252,9 @@ export default function ProjectsPage() {
                 : filtered.map((p, i) => <ProjectCard key={p.id} project={p} index={i} />)}
             </div>
           )}
-        </main>
-      </div>
+          </main>
+        </div>
+      </SmoothScroll>
 
       <style>{`
         @keyframes fadeUp {

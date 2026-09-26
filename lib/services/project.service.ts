@@ -4,7 +4,7 @@ import type { ProjectDTO } from '@/types/portfolio';
 
 // Explicit field projection — only what the UI needs is ever selected from
 // the database, and only what's listed here is ever returned to the client.
-const PUBLIC_FIELDS = 'num title subtitle desc tags github live year category highlights';
+const PUBLIC_FIELDS = 'num title subtitle desc tags github live year category highlights featured';
 
 type ProjectLean = {
   _id: unknown;
@@ -18,6 +18,7 @@ type ProjectLean = {
   year: string;
   category: string;
   highlights: string[];
+  featured: boolean;
 };
 
 function toDTO(doc: ProjectLean): ProjectDTO {
@@ -33,6 +34,7 @@ function toDTO(doc: ProjectLean): ProjectDTO {
     year: doc.year,
     category: doc.category,
     highlights: doc.highlights ?? [],
+    featured: doc.featured ?? false,
   };
 }
 

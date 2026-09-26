@@ -248,7 +248,7 @@ export default function Contact() {
         </div>
 
         {/* Footer */}
-        <Reveal direction="up" delay={200}>
+        <Reveal direction="fade" delay={200}>
           <footer style={{
             marginTop: 'clamp(56px, 8vw, 80px)',
             paddingTop: '32px',
