@@ -5,18 +5,77 @@ import type { ExperienceDTO } from '@/types/portfolio';
 
 function TimelineSkeleton() {
   return (
-    <div className="timeline-grid">
-      {[0, 1, 2, 3].map(i => (
-        <div key={i} style={{ padding: '28px', border: '1px solid var(--border)', borderRadius: '16px', background: 'var(--bg)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <div className="skeleton" style={{ width: '48px', height: '18px', borderRadius: '100px' }} />
-            <div className="skeleton" style={{ width: '80px', height: '12px' }} />
+    <div className="about-timeline-columns">
+      {['Experience', 'Education'].map(group => (
+        <div key={group}>
+          <h4 className="about-timeline-title">{group}</h4>
+          <div className="about-timeline-scroll scrollable-panel">
+            <div className="about-timeline-list">
+              {[0, 1].map(i => (
+                <div key={i} className="about-timeline-item">
+                  <span className="about-timeline-dot" />
+                  <div className="about-timeline-card">
+                    <div className="skeleton" style={{ width: '80px', height: '12px', marginBottom: '12px' }} />
+                    <div className="skeleton" style={{ width: '70%', height: '15px', marginBottom: '8px' }} />
+                    <div className="skeleton" style={{ width: '50%', height: '13px', marginBottom: '12px' }} />
+                    <div className="skeleton" style={{ width: '95%', height: '13px' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="skeleton" style={{ width: '70%', height: '15px', marginBottom: '8px' }} />
-          <div className="skeleton" style={{ width: '50%', height: '13px', marginBottom: '12px' }} />
-          <div className="skeleton" style={{ width: '95%', height: '13px' }} />
         </div>
       ))}
+    </div>
+  );
+}
+
+function TimelineGroup({ title, items }: { title: string; items: ExperienceDTO[] }) {
+  return (
+    <div>
+      <h4 className="about-timeline-title">{title}</h4>
+      <div className="about-timeline-scroll scrollable-panel">
+        <div className="about-timeline-list">
+          {items.map((item, i) => (
+            <Reveal key={item.id} direction="up" delay={i * 80}>
+              <div className="about-timeline-item">
+                <span className="about-timeline-dot" />
+                <div
+                  className={`about-timeline-card${item.type === 'edu' ? ' about-timeline-card-education' : ''}`}
+                  onMouseEnter={e => {
+                    if (item.type === 'work') (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-mid)';
+                  }}
+                  onMouseLeave={e => {
+                    if (item.type === 'work') (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '12px' }}>
+                    <span style={{
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: '11px', fontWeight: 600,
+                      color: item.type === 'work' ? 'var(--accent-green)' : 'var(--text-muted)',
+                      background: item.type === 'work' ? 'var(--accent-green-bg)' : 'var(--tag-bg)',
+                      padding: '3px 10px', borderRadius: '100px',
+                    }}>
+                      {item.type === 'work' ? 'Work' : 'Education'}
+                    </span>
+                    <span style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontStyle: 'italic', fontSize: '13px', color: 'var(--text-dim)', textAlign: 'right' }}>
+                      {item.period}
+                    </span>
+                  </div>
+                  <h5 style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: '15px', fontWeight: 600,
+                    color: 'var(--text)', marginBottom: '4px',
+                  }}>{item.role}</h5>
+                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px' }}>{item.org}</p>
+                  <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '13px', color: 'var(--text-muted)', lineHeight: 1.65 }}>{item.desc}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -28,7 +87,8 @@ export default function About() {
     error: timelineError,
   } = useApiData<ExperienceDTO[]>('/api/experience');
   const timeline = timelineData ?? [];
-  const showTimelineScroll = timeline.length > 3;
+  const experience = timeline.filter(item => item.type === 'work');
+  const education = timeline.filter(item => item.type === 'edu');
 
   return (
     <section id="about" style={{ background: 'var(--surface)' }}>
@@ -54,7 +114,7 @@ export default function About() {
 
         {/* Two-col: bio + stats */}
         <div className="about-grid" style={{ marginBottom: 'clamp(64px, 9vw, 100px)' }}>
-          <Reveal direction="left">
+          <Reveal className="about-bio-column" direction="left">
             <p style={{
               fontFamily: "'Inter', sans-serif",
               fontSize: '16px', fontWeight: 400,
@@ -92,7 +152,7 @@ export default function About() {
               ))}
             </div>
 
-            <a href="#" style={{
+            <a href="/resume.pdf" download="Rakesh-Mora-Resume.pdf" style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
               padding: '10px 20px',
               border: '1px solid var(--border)',
@@ -112,9 +172,15 @@ export default function About() {
             </a>
           </Reveal>
 
+          {/* Full image on the right on desktop */}
+          <Reveal className="about-image-column" direction="right">
+            <a className="about-image-link" href="#" aria-label="Open profile image">
+              <img className="about-image" src="/Professional%20Office%20Portrait.png" alt="Rakesh Mora" />
+            </a>
+          </Reveal>
+
           {/* Stats + languages */}
-          <Reveal direction="right">
-            {/* Stats row */}
+          <Reveal className="about-details-column" direction="right">
             <div className="about-stats-grid" style={{ background: 'var(--border)', border: '1px solid var(--border)', borderRadius: 'var(--card-radius)', overflow: 'hidden', marginBottom: '24px' }}>
               {[
                 { val: '6+', label: 'Projects Built' },
@@ -123,12 +189,12 @@ export default function About() {
               ].map((s, i) => (
                 <div key={i} style={{
                   background: 'var(--surface)',
-                  padding: '28px 20px',
+                  padding: '20px 14px',
                   textAlign: 'center',
                 }}>
                   <p style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
-                    fontSize: '38px', fontWeight: 400,
+                    fontSize: '32px', fontWeight: 400,
                     color: 'var(--text)', letterSpacing: '-0.03em',
                     lineHeight: 1, marginBottom: '6px',
                   }}>{s.val}</p>
@@ -139,14 +205,14 @@ export default function About() {
 
             {/* Languages */}
             <div style={{
-              padding: '24px',
+              padding: '18px',
               background: 'var(--bg)',
               border: '1px solid var(--border)',
               borderRadius: '16px',
               marginBottom: '16px',
             }}>
-              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '10px', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>Languages</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '10px', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '12px' }}>Languages</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '9px' }}>
                 {[
                   { lang: 'English', level: 'Professional', pct: 90 },
                   { lang: 'Telugu', level: 'Native', pct: 100 },
@@ -172,11 +238,12 @@ export default function About() {
         <Reveal direction="up">
           <h3 style={{
             fontFamily: "'DM Serif Display', Georgia, serif",
-            fontSize: 'clamp(24px, 3.4vw, 32px)', fontWeight: 400,
-            color: 'var(--text)', letterSpacing: '-0.02em',
+            fontSize: 'clamp(32px, 5.5vw, 64px)',
+            fontWeight: 400, letterSpacing: '-0.03em',
+            color: 'var(--text)', lineHeight: 1.0,
             marginBottom: 'clamp(32px, 5vw, 48px)',
           }}>
-            Experience & Education
+            Experience &amp; Education
           </h3>
         </Reveal>
 
@@ -201,73 +268,9 @@ export default function About() {
         )}
 
         {!timelineLoading && !timelineError && timeline.length > 0 && (
-          <div
-            className={showTimelineScroll ? 'scrollable-panel' : undefined}
-            style={
-              showTimelineScroll
-                ? {
-                    paddingRight: '8px',
-                    overflowY: 'auto',
-                    overscrollBehavior: 'auto',
-                    scrollbarGutter: 'stable',
-                  }
-                : undefined
-            }
-          >
-            <div className="timeline-grid">
-              {timeline.map((item, i) => (
-                <Reveal key={item.id} direction="up" delay={i * 80}>
-                  <div style={{
-                    padding: '28px',
-                    border: '1.5px solid var(--border)',
-                    borderRadius: '16px',
-                    background: item.type === 'work' ? 'var(--surface)' : 'var(--bg)',
-                    position: 'relative',
-                    transition: 'border-color 0.3s ease',
-                  }}
-                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-mid)'}
-                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                      <span style={{
-                        fontFamily: "'Inter', sans-serif",
-                        fontSize: '11px', fontWeight: 600,
-                        color: item.type === 'work' ? 'var(--accent-green)' : 'var(--text-muted)',
-                        background: item.type === 'work' ? 'var(--accent-green-bg)' : 'var(--tag-bg)',
-                        padding: '3px 10px', borderRadius: '100px',
-                      }}>
-                        {item.type === 'work' ? 'Work' : 'Education'}
-                      </span>
-                      <span style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontStyle: 'italic', fontSize: '13px', color: 'var(--text-dim)' }}>
-                        {item.period}
-                      </span>
-                    </div>
-                    <h4 style={{
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: '15px', fontWeight: 600,
-                      color: 'var(--text)', marginBottom: '4px',
-                    }}>{item.role}</h4>
-                    <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px' }}>{item.org}</p>
-                    <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '13px', color: 'var(--text-muted)', lineHeight: 1.65 }}>{item.desc}</p>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-
-            {showTimelineScroll && (
-              <div style={{
-                display: 'flex', justifyContent: 'center',
-                marginTop: '10px', paddingTop: '8px',
-                background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, var(--surface) 40%)',
-                color: 'var(--text-dim)',
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '10px', fontWeight: 600,
-                letterSpacing: '0.12em', textTransform: 'uppercase',
-                position: 'sticky', bottom: 0,
-              }}>
-                Scroll for more ↓
-              </div>
-            )}
+          <div className="about-timeline-columns">
+            {experience.length > 0 && <TimelineGroup title="Experience" items={experience} />}
+            {education.length > 0 && <TimelineGroup title="Education" items={education} />}
           </div>
         )}
       </div>

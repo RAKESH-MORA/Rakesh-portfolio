@@ -259,7 +259,7 @@ export default function Certificates() {
 
         {(certLoading || (!certError && certificates.length > 0)) && (
           <div
-            className={showCertScroll && !certLoading ? 'scrollable-panel' : undefined}
+            className={showCertScroll && !certLoading ? 'scrollable-panel certificate-scroll' : undefined}
             style={
               showCertScroll && !certLoading
                 ? {
@@ -312,7 +312,7 @@ export default function Certificates() {
 
             {(achLoading || (!achError && achievements.length > 0)) && (
               <div
-                className={showAchievementScroll && !achLoading ? 'scrollable-panel' : undefined}
+                className={showAchievementScroll && !achLoading ? 'scrollable-panel achievement-scroll' : undefined}
                 style={
                   showAchievementScroll && !achLoading
                     ? {

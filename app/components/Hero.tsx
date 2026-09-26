@@ -1,24 +1,22 @@
 'use client';
-import { useEffect, useState } from 'react';
 import Reveal from './Reveal';
 
 // ── All logos: AI companies + skill tech ──────────────────────────────────────
 const ALL_LOGOS = [
-  // ── AI / Companies ──
   {
     name: 'OpenAI',
     color: '#10a37f',
-    svg: <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></svg>,
+    svg: <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%"><path d="M12 2a10 10 0 1 0 7.07 17.07A10 10 0 0 0 12 2zm0 3a7 7 0 0 1 5.8 3.08l-2.16 1.25A4.5 4.5 0 0 0 8.1 8.08L6 6.87A7 7 0 0 1 12 5zm-6.06 4.2 2.17 1.25a4.5 4.5 0 0 0 4.38 5.64v2.5A7 7 0 0 1 5.94 9.2zm4.75 9.14v-2.5a4.5 4.5 0 0 0 4.38-5.64l2.17-1.25a7 7 0 0 1-6.55 9.39z"/></svg>,
   },
   {
     name: 'Anthropic',
     color: '#c96442',
-    svg: <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%"><path d="M13.827 3.52h3.603L24 20h-3.603l-6.57-16.48zm-3.654 0H6.57L0 20h3.603l1.378-3.504h6.17l1.378 3.504h3.604L10.173 3.52zm-3.747 9.98 1.957-5.003 1.957 5.003H6.426z"/></svg>,
+    svg: <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%"><path d="M12 3 22 21h-4.2l-2.1-4H8.3l-2.1 4H2L12 3zm0 6.8-2.1 4h4.2l-2.1-4z"/></svg>,
   },
   {
     name: 'Google',
     color: '#4285F4',
-    svg: <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" fill="#4285F4"/></svg>,
+    svg: <svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>,
   },
   {
     name: 'Meta AI',
@@ -186,76 +184,22 @@ const ALL_LOGOS = [
   },
 ];
 
-function LogoCarousel() {
-  const [activeIndex, setActiveIndex] = useState(0);
+function LogoNetwork() {
+  const stripLogos = ALL_LOGOS.map(logo => logo.name);
 
-  useEffect(() => {
-    if (typeof window.matchMedia === 'function' &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    const timer = window.setInterval(() => {
-      if (document.hidden) return;
-      setActiveIndex((i) => (i + 1) % ALL_LOGOS.length);
-    }, 1800);
-
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const activeLogo = ALL_LOGOS[activeIndex];
-  const SATELLITE_COUNT = 8;
-  const stepAngle = 360 / SATELLITE_COUNT;
+  const repeatedLogos = [...stripLogos, ...stripLogos];
 
   return (
-    <div className="hero-logo-carousel">
-      <div className="orbit-container">
-
-        {/* Orbiting Satellite Logos */}
-        <div
-          className="orbit-satellites-group"
-          style={{
-            transform: `rotate(${-activeIndex * stepAngle}deg)`,
-          }}
-        >
-          {Array.from({ length: SATELLITE_COUNT }).map((_, slotIndex) => {
-            const logoIndex = (activeIndex + slotIndex + 1) % ALL_LOGOS.length;
-            const logo = ALL_LOGOS[logoIndex];
-            const baseAngle = slotIndex * stepAngle;
-
-            return (
-              <div
-                key={slotIndex}
-                className="orbit-satellite-slot"
-                style={{
-                  transform: `rotate(${baseAngle}deg) translate(var(--orbit-radius)) rotate(${-baseAngle}deg)`,
-                }}
-              >
-                <div
-                  className="orbit-satellite-content"
-                  style={{
-                    transform: `rotate(${activeIndex * stepAngle}deg)`,
-                  }}
-                  title={logo.name}
-                >
-                  <div className="satellite-icon-box">{logo.svg}</div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Center Main Highlighted Logo */}
-        <div className="orbit-center-hub">
-          <div
-            className="orbit-center-icon"
-            style={{
-              color: activeLogo.color,
-              filter: `drop-shadow(0 0 16px ${activeLogo.color}66)`,
-            }}
-          >
-            {activeLogo.svg}
-          </div>
-          <p className="orbit-center-label">{activeLogo.name}</p>
-        </div>
+    <div className="hero-logo-strip" aria-hidden="true">
+      <div className="hero-logo-marquee hero-logo-marquee-up">
+        {repeatedLogos.map((name, index) => {
+          const logo = ALL_LOGOS.find(item => item.name === name) ?? ALL_LOGOS[index % ALL_LOGOS.length];
+          return (
+            <div key={`${name}-${index}`} className="hero-strip-logo" title={logo.name}>
+              <span className="hero-strip-logo-inner">{logo.svg}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -272,29 +216,10 @@ export default function Hero() {
       paddingBottom: 'clamp(28px, 5vh, 48px)',
       boxSizing: 'border-box',
     }}>
-      {/* Subtle dotted background */}
-       <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-            zIndex: 4,
-            backgroundImage:
-               'radial-gradient(circle, var(--text-dim) 0.9px, transparent 0.9px)',
-            backgroundSize: '30px 30px',
-            opacity: 0.29,
-            maskImage:
-               'linear-gradient(to bottom, black 0%, black 10%, transparent 100%)',
-             WebkitMaskImage:
-               'linear-gradient(to bottom, black 0%, black 10%, transparent 100%)',
-           }}
-        />   
-      {/*Logo Carousel blinking*/}
-      <LogoCarousel />
+      <LogoNetwork />
 
       {/* ── Main content ── */}
-      <div className="container" style={{ position: 'relative', zIndex: 1, width: '100%', boxSizing: 'border-box' }}>
+      <div className="container" style={{ position: 'relative', zIndex: 2, width: '100%', boxSizing: 'border-box' }}>
 
         {/* Status */}
         <Reveal delay={0} once>
@@ -426,125 +351,78 @@ export default function Hero() {
           from { opacity: 0; transform: translateX(-50%) translateY(12px); }
           to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-
-        /* ── Orbit Carousel Responsive Layout ── */
-        .hero-logo-carousel {
-          position: absolute;
-          top: 18%;
-          right: 12%;
-          pointer-events: none;
-          z-index: 2;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        @keyframes marqueeUp {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-50%); }
+        }
+        @keyframes marqueeHorizontal {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
 
-        .orbit-container {
-          --orbit-size: clamp(260px, 22vw, 360px);
-          --orbit-radius: calc(var(--orbit-size) / 2);
-          position: relative;
-          width: var(--orbit-size);
-          height: var(--orbit-size);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .orbit-satellites-group {
+        .hero-logo-strip {
           position: absolute;
-          inset: 0;
-          border-radius: 50%;
-          transition: transform 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
-        }
-
-        .orbit-satellite-slot {
-          position: absolute;
+          right: clamp(48px, 4vw, 110px);
           top: 50%;
-          left: 50%;
-          width: 0;
-          height: 0;
-        }
-
-        .orbit-satellite-content {
-          position: absolute;
-          top: -20px;
-          left: -20px;
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: transform 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
-        }
-
-        .satellite-icon-box {
-          width: 28px;
-          height: 28px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          filter: grayscale(100%);
-          opacity: 0.38;
-          color: var(--text-muted);
-          transition: filter 0.4s ease, opacity 0.4s ease, transform 0.4s ease;
-        }
-
-        /* Main Center Highlighted Logo */
-        .orbit-center-hub {
-          position: relative;
-          z-index: 3;
+          transform: translateY(-50%);
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: center;
-          gap: 10px;
-          text-align: center;
+          z-index: 1;
+          pointer-events: none;
+          width: 120px;
+          height: min(68vh, 560px);
+          overflow: hidden;
+          mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.95) 10%, rgba(0,0,0,1) 45%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.95) 90%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.95) 10%, rgba(0,0,0,1) 45%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.95) 90%, transparent 100%);
         }
 
-        .orbit-center-icon {
-          width: clamp(52px, 5vw, 76px);
-          height: clamp(52px, 5vw, 76px);
+        .hero-logo-marquee {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+          width: 100%;
+          min-width: max-content;
+          will-change: transform;
+        }
+
+        .hero-logo-marquee-up {
+          animation: marqueeUp 40s linear infinite;
+        }
+
+        .hero-strip-logo {
+          position: relative;
+          width: clamp(62px, 4.5vw, 92px);
+          height: clamp(62px, 4.5vw, 92px);
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: color 0.5s ease, filter 0.5s ease, transform 0.5s ease;
+          border-radius: 18px;
+          background: transparent;
+          border: none;
+          box-shadow: none;
+          overflow: visible;
+          filter: grayscale(100%) brightness(0.9) drop-shadow(0 8px 18px rgba(0,0,0,0.12));
+          opacity: 0.86;
         }
 
-        .orbit-center-label {
-          font-family: 'Inter', sans-serif;
-          font-weight: 600;
-          font-size: clamp(12px, 1.1vw, 15px);
+        .hero-strip-logo-inner {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 78%;
+          height: 78%;
           color: var(--text);
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          opacity: 0.9;
-          margin: 0;
-          white-space: nowrap;
-          transition: opacity 0.4s ease;
         }
 
-        @media (max-width: 1200px) {
-          .hero-logo-carousel { right: 8%; }
+        .hero-strip-logo-inner svg {
+          width: 100%;
+          height: 100%;
         }
-        @media (max-width: 1024px) {
-          .hero-logo-carousel {
-            top: 14%;
-            right: 6%;
-          }
-          .orbit-container {
-            --orbit-size: clamp(210px, 24vw, 270px);
-          }
-          .orbit-satellite-content {
-            top: -16px;
-            left: -16px;
-            width: 32px;
-            height: 32px;
-          }
-          .satellite-icon-box {
-            width: 22px;
-            height: 22px;
-          }
-        }
+
         @media (max-width: 768px) {
           #home {
             padding-top: clamp(60px, 8vh, 100px) !important;
@@ -552,40 +430,44 @@ export default function Hero() {
             padding-right: clamp(16px, 4vw, 24px) !important;
             padding-bottom: clamp(20px, 4vh, 40px) !important;
           }
+          .hero-logo-strip {
+            position: static;
+            transform: none;
+            margin: 0 auto 22px;
+            width: min(96vw, 560px);
+            height: 124px;
+            overflow: hidden;
+            mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.95) 8%, rgba(0,0,0,1) 22%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.95) 92%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.95) 8%, rgba(0,0,0,1) 22%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.95) 92%, transparent 100%);
+          }
+
+          .hero-logo-marquee {
+            flex-direction: row;
+            align-items: center;
+            gap: 14px;
+            width: max-content;
+            min-width: max-content;
+            animation: marqueeHorizontal 30s linear infinite;
+          }
+
+          .hero-strip-logo {
+            width: clamp(58px, 14vw, 76px);
+            height: clamp(58px, 14vw, 76px);
+          }
+
         }
-        @media (max-width: 640px) {
-          .hero-logo-carousel {
-            top: 14%;
-            right: 12%;
-          }
-          .orbit-container {
-            --orbit-size: clamp(140px, 38vw, 200px);
-          }
-          .orbit-satellite-content {
-            top: -12px;
-            left: -12px;
-            width: 24px;
-            height: 24px;
-          }
-          .satellite-icon-box {
-            width: 16px;
-            height: 16px;
-          }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero-logo-orbit,
+          .hero-orbit-list,
+          .hero-orbit-item { animation: none !important; }
         }
+
         @media (max-width: 480px) {
           #home {
             padding-top: clamp(48px, 6vh, 80px) !important;
             padding-left: 16px !important;
             padding-right: 16px !important;
-          }
-        }
-        @media (max-width: 380px) {
-          .hero-logo-carousel {
-            top: 14%;
-            right: 14%;
-          }
-          .orbit-container {
-            --orbit-size: 120px;
           }
         }
       `}</style>

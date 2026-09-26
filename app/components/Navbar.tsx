@@ -74,16 +74,18 @@ export default function Navbar() {
   return (
     <>
       <header style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+        position: 'fixed', top: '12px', left: 'var(--container-pad)', right: 'var(--container-pad)', zIndex: 100,
         paddingInline: 'var(--container-pad)',
         height: 'var(--nav-h)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         gap: '12px',
-        background: scrolled ? 'var(--nav-bg)' : 'transparent',
-        borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
-        WebkitBackdropFilter: scrolled ? 'blur(16px) saturate(1.6)' : 'none',
-        backdropFilter: scrolled ? 'blur(16px) saturate(1.6)' : 'none',
-        transition: 'background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease',
+        background: scrolled ? 'var(--nav-bg)' : 'var(--surface)',
+        border: '1px solid var(--border)',
+        borderRadius: '50px',
+        boxShadow: 'var(--shadow)',
+        WebkitBackdropFilter: 'blur(16px) saturate(1.6)',
+        backdropFilter: 'blur(16px) saturate(1.6)',
+        transition: 'background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease',
       }}>
 
         {/* Logo */}
@@ -190,7 +192,7 @@ export default function Navbar() {
         aria-hidden={!menuOpen}
         style={{
           position: 'fixed',
-          top: 'calc(var(--nav-h) + 8px)', left: '12px', right: '12px',
+          top: 'calc(var(--nav-h) + 20px)', left: '12px', right: '12px',
           maxHeight: 'calc(100dvh - var(--nav-h) - 24px)',
           overflowY: 'auto',
           background: 'var(--surface)',
